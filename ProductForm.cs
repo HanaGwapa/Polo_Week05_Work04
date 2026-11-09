@@ -17,6 +17,12 @@ namespace Polo_Week05_Work04
         {
             InitializeComponent();
 
+            Random random = new Random();
+
+            //txtBoxBarcode.Text = random.Next(100000000, 999999999).ToString();
+
+            lblBarCodeAvailable.Text = "Barcode is available.";
+
             cmbCategory.Items.Add("Food");
             cmbCategory.Items.Add("Beverages");
             cmbCategory.Items.Add("Personal Care");
@@ -48,6 +54,8 @@ namespace Polo_Week05_Work04
         private void button2_Click(object sender, EventArgs e)
         {
             txtBoxBarcode.Clear();
+           // lblBarCodeAvailable.Text = "";
+
             txtBoxName.Clear();
             txtBoxDesc.Clear();
             cmbCategory.SelectedIndex = -1;
@@ -63,11 +71,15 @@ namespace Polo_Week05_Work04
         }
         private void txtBoxBarcode_TextChanged(object sender, EventArgs e)
         {
-            Random random = new Random();
 
-            txtBoxBarcode.Text = random.Next(100000000, 999999999).ToString();
-
-            //lblBarCodeAvailable.Text = "Barcode is available.";
+            if (!string.IsNullOrWhiteSpace(txtBoxBarcode.Text))
+            {
+                lblBarCodeAvailable.Text = "Barcode is available.";
+            }
+            else
+            {
+                lblBarCodeAvailable.Text = "";
+            }
         }
 
         private void txtBoxMarkup_TextChanged(object sender, EventArgs e)
@@ -106,11 +118,100 @@ namespace Polo_Week05_Work04
 
         private void btnCancel_Click(object sender, EventArgs e)
         {
-            this.Close();
+            DialogResult result = MessageBox.Show(
+            "Are you sure you want to cancel?",
+            "Confirm Cancel",
+            MessageBoxButtons.YesNo,
+            MessageBoxIcon.Question
+            );
+
+            if (result == DialogResult.Yes)
+            {
+                this.Close();
+            }
         }
 
         private void btnSave_Click(object sender, EventArgs e)
         {
+            if (txtBoxBarcode.Text.Length != 13)
+            {
+                MessageBox.Show("Barcode must contain exactly 13 digits.",
+                    "Invalid Barcode",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+
+                txtBoxBarcode.Focus();
+                return;
+            }
+            if (string.IsNullOrWhiteSpace(txtBoxBarcode.Text))
+            {
+                MessageBox.Show("Please enter the barcode.",
+                    "Validation Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+
+                txtBoxBarcode.Focus();
+                return;
+            }
+            if (string.IsNullOrWhiteSpace(txtBoxDesc.Text))
+            {
+                MessageBox.Show("Please enter the product description.",
+                    "Validation Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+
+                txtBoxDesc.Focus();
+                return;
+            }
+            if (cmbCategory.SelectedIndex == -1)
+            {
+                MessageBox.Show("Please select a category.",
+                    "Validation Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+
+                cmbCategory.Focus();
+                return;
+            }
+            if (!rdbLocal.Checked && !rdbAbroad.Checked)
+            {
+                MessageBox.Show("Please select the product origin.",
+                    "Validation Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+
+                return;
+            }
+            if (!decimal.TryParse(txtBoxCost.Text, out decimal cost) || cost <= 0)
+            {
+                MessageBox.Show("Please enter a valid cost greater than zero.",
+                    "Validation Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+
+                txtBoxCost.Focus();
+                return;
+            }
+            if (!decimal.TryParse(txtBoxPrice.Text, out decimal price) || price <= 0)
+            {
+                MessageBox.Show("Please enter a valid price greater than zero.",
+                    "Validation Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+
+                txtBoxPrice.Focus();
+                return;
+            }
+            if (price < cost)
+            {
+                MessageBox.Show("The selling price cannot be lower than the cost.",
+                    "Validation Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+
+                txtBoxPrice.Focus();
+                return;
+            }
             if (txtBoxBarcode.Text == "" ||
                 txtBoxName.Text == "" ||
                 txtBoxDesc.Text == "" ||
@@ -122,13 +223,7 @@ namespace Polo_Week05_Work04
                 MessageBox.Show("Please complete all required fields.");
                 return;
             }
-            if (!decimal.TryParse(txtBoxCost.Text, out decimal cost) ||
-                !decimal.TryParse(txtBoxPrice.Text, out decimal price) ||
-                cost <= 0 || price <= 0)
-            {
-                MessageBox.Show("Please enter valid Cost and Price values.");
-                return;
-            }
+
             Product product = new Product();
 
             product.Barcode = txtBoxBarcode.Text;
@@ -140,6 +235,7 @@ namespace Polo_Week05_Work04
             product.Cost = cost;
             product.Price = price;
             product.Markup = ((price - cost) / cost) * 100;
+         
 
             MessageBox.Show("Product saved successfully!",
                 "Success",

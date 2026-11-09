@@ -67,6 +67,7 @@
             // txtBoxBarcode
             // 
             this.txtBoxBarcode.Location = new System.Drawing.Point(127, 15);
+            this.txtBoxBarcode.MaxLength = 13;
             this.txtBoxBarcode.Name = "txtBoxBarcode";
             this.txtBoxBarcode.Size = new System.Drawing.Size(272, 22);
             this.txtBoxBarcode.TabIndex = 1;
